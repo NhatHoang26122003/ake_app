@@ -9,5 +9,4 @@ const Map<String, String> enUS = {
   "signUp": "Sign up",
   "enterEmail": "Enter your email",
   "enterPassword": "Enter your password"
-
 };
