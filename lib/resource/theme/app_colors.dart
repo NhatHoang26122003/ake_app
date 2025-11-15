@@ -11,7 +11,8 @@ class AppColors {
   static Color isSelectedNavBarColor = hexToColor('#F8D000');
   static const Color black = Color(0xFF181A20);
   static const Color black80 = Color(0xCC000000);
-  
+
+  static const Color mainColor = Color(0xFF00E676);
   static Color colorFF7E5F = hexToColor("#FF7E5F");
   static Color color0E0E15 = hexToColor("#0E0E15");
   static Color colorBDBDBD = hexToColor("#BDBDBD");

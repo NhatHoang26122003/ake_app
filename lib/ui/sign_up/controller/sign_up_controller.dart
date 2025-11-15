@@ -4,28 +4,36 @@ import 'package:tekup_connection_mobile/common/base/controller/base_controller.d
 import 'package:tekup_connection_mobile/common/repository/auth_repository.dart';
 import 'package:tekup_connection_mobile/routes/app_routes.dart';
 
-class LoginController extends BaseController {
-  static LoginController get to => Get.find<LoginController>();
+class SignUpController extends BaseController {
+  static SignUpController get to => Get.find<SignUpController>();
+
   AuthRepository repository = Get.find();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Rx<bool> isShowPassword = false.obs;
+  Rx<bool> isShowConfirmPassword = false.obs;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
 
-  void toggleShowPassword() {
+  void toggleShowPassword (){
     isShowPassword.value = !isShowPassword.value;
   }
 
-  void onLogin() {
+  void toggleShowConfirmPassword (){
+    isShowConfirmPassword.value = !isShowConfirmPassword.value;
+  }
+
+
+  void onSignUp(){
     final bool isValid = formKey.currentState!.validate();
     if (isValid) {
-      Get.toNamed(PageName.mainPage);
+      Get.offAllNamed(PageName.loginPage);
     }
   }
 
-  void onNavigateSignupPage() {
-    Get.toNamed(PageName.signUpPage);
+  void onNavigateLoginPage(){
+    Get.toNamed(PageName.loginPage);
   }
 }

@@ -67,7 +67,7 @@ class AppTextFiled extends StatelessWidget {
                 ),
                 TextSpan(
                   text:
-                  isRequired == false ? labelTextOptional.nullToEmpty : '*',
+                  isRequired == false ? labelTextOptional.nullToEmpty : ' *',
                   style: AppStyles.STYLE_14.copyWith(
                     color: AppColors.colorFF2D2D,
                   ),

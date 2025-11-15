@@ -9,11 +9,11 @@ import 'package:tekup_connection_mobile/common/base/widgets/base_page_widget.dar
 import 'package:tekup_connection_mobile/resource/asset/app_images.dart';
 import 'package:tekup_connection_mobile/resource/theme/app_colors.dart';
 import 'package:tekup_connection_mobile/resource/theme/app_style.dart';
-import 'package:tekup_connection_mobile/ui/login/controller/login_controller.dart';
+import 'package:tekup_connection_mobile/ui/sign_up/controller/sign_up_controller.dart';
 import 'package:tekup_connection_mobile/utils/app_validator.dart';
 
-class LoginPage extends BasePage<LoginController> {
-  const LoginPage({super.key});
+class SignUpPage extends BasePage<SignUpController> {
+  const SignUpPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class LoginPage extends BasePage<LoginController> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 150.h),
+            SizedBox(height: 100.h),
             Text(
               "appName".tr,
               style: AppStyles.STYLE_28_BOLD.copyWith(
@@ -54,7 +54,7 @@ class LoginPage extends BasePage<LoginController> {
                   children: [
                     SizedBox(height: 20.h),
                     Text(
-                      "login".tr,
+                      "signUp".tr,
                       style: AppStyles.STYLE_24_BOLD.copyWith(
                         color: AppColors.black,
                       ),
@@ -69,33 +69,26 @@ class LoginPage extends BasePage<LoginController> {
                     _buildInputSection(),
                     SizedBox(height: 40.h),
                     AppButton(
-                      text: "login".tr,
-                      onPressed: controller.onLogin,
-                    ),
-                    SizedBox(height: 10.h),
-                    Text(
-                      "${"forgotPassword".tr} ?",
-                      style: AppStyles.STYLE_12.copyWith(
-                        color: AppColors.black,
-                      ),
+                      text: "signUp".tr,
+                      onPressed: controller.onSignUp,
                     ),
                     SizedBox(height: 10.h),
                     RichText(
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: "noAccount".tr,
+                            text: "hasAccount".tr,
                             style: AppStyles.STYLE_14.copyWith(
                               color: AppColors.black,
                             ),
                           ),
                           TextSpan(
-                            text: " ${"signUp".tr}",
+                            text: " ${"login".tr}",
                             style: AppStyles.STYLE_14.copyWith(
                               color: AppColors.colorFF7E5F,
                             ),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = controller.onNavigateSignupPage,
+                              ..onTap = controller.onNavigateLoginPage,
                           ),
                         ],
                       ),
@@ -135,6 +128,30 @@ class LoginPage extends BasePage<LoginController> {
                 onTap: controller.toggleShowPassword,
                 child: SvgPicture.asset(
                   controller.isShowPassword.value
+                      ? AppImages.icEyeSlash
+                      : AppImages.icEye,
+                  height: 24.w,
+                  width: 24.w,
+                  fit: BoxFit.scaleDown,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Obx(
+            () => AppTextFiled(
+              labelText: "confirmPassword".tr,
+              hintText: "enterConfirmPassword".tr,
+              controller: controller.confirmPasswordController,
+              obscureText: !controller.isShowConfirmPassword.value,
+              validator: (value) => AppValidator.validateConfirmPassword(
+                value,
+                controller.passwordController.text.trim(),
+              ),
+              suffixIcon: InkWell(
+                onTap: controller.toggleShowConfirmPassword,
+                child: SvgPicture.asset(
+                  controller.isShowConfirmPassword.value
                       ? AppImages.icEyeSlash
                       : AppImages.icEye,
                   height: 24.w,
