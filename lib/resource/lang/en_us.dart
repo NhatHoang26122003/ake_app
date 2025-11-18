@@ -1,12 +1,14 @@
 const Map<String, String> enUS = {
   "appName": "AKE",
   "subTitle": "Please enter the information bellow",
+  "userName": "Username",
   "email": "Email",
   "password": "Password",
   "login": "Login",
   "forgotPassword": "Forgot password",
   "noAccount": "Don't have an account?",
   "signUp": "Sign up",
+  "enterUserName": "Enter your username",
   "enterEmail": "Enter your email",
   "enterPassword": "Enter your password",
   "confirmPassword": "Confirm password",
@@ -14,6 +16,7 @@ const Map<String, String> enUS = {
   "hasAccount": "You have an account!",
   "thisFieldIsRequired": "This field is required",
   "invalidPhoneNumber": "Please enter a valid 10-digit phone number",
+  "requiredUserName": "Username is required",
   "requiredEmail": "Email is required",
   "errorEmail": "Please enter a valid email address",
   "requiredPass": "Password is required",
@@ -23,5 +26,8 @@ const Map<String, String> enUS = {
   //main page
   "newChat": "New chat",
   "historyChat": "History chat",
-
+  "welcome": "Welcome",
+  "suggestQuestion": "can I help you?",
+  "enterQuestion": "Enter question",
+  "test": "Test chat",
 };

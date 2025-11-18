@@ -1,145 +1,165 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:tekup_connection_mobile/common/base/api/api_connect.dart';
 import 'package:tekup_connection_mobile/common/base/controller/base_controller.dart';
+import 'package:tekup_connection_mobile/common/base/controller/observer_func.dart';
+import 'package:tekup_connection_mobile/common/base/storage/local_data.dart';
+import 'package:tekup_connection_mobile/common/repository/chat_repository.dart';
 import 'package:tekup_connection_mobile/data/model/chat_model.dart';
 import 'package:tekup_connection_mobile/data/model/message_model.dart';
+import 'package:tekup_connection_mobile/data/model/user_model.dart';
+import 'package:tekup_connection_mobile/data/response/base_get_response.dart';
 import 'package:tekup_connection_mobile/routes/app_routes.dart';
 
 class MainController extends BaseController {
   static MainController get to => Get.find<MainController>();
 
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
-  RxList<ChatModel> chatHistory = <ChatModel>[].obs;
+  UserModel? user = LocalData.shared.user;
+  RxList<ChatModel> chatHistories = <ChatModel>[].obs;
   RxList<MessageModel> messageList = <MessageModel>[].obs;
 
-  var currentChatId = Rxn<int>();
+  var currentChatId = Rxn<String>();
+  var isLoadingResponse = false.obs;
 
+  late IO.Socket socket;
+  final ChatRepository _chatRepository = Get.find();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController textController = TextEditingController();
+  ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
     super.onInit();
+    _initWebSocket();
     loadChatHistory();
   }
 
-  void loadChatHistory() {
-    final chat1Messages = <MessageModel>[
-      MessageModel(
-          text:
-          "Flutter là một UI toolkit của Google để xây dựng các ứng dụng...",
-          role: 'bot',
-          timestamp: DateTime.now().subtract(const Duration(minutes: 8))),
-      MessageModel(
-          text: "Flutter là gì?",
-          role: 'user',
-          timestamp: DateTime.now().subtract(const Duration(minutes: 9))),
-      MessageModel(
-          text: "Chào bạn, tôi có thể giúp gì cho bạn hôm nay?",
-          role: 'bot',
-          timestamp: DateTime.now().subtract(const Duration(minutes: 10))),
-    ];
+  @override
+  void onClose() {
+    _disconnectWebSocket();
+    textController.dispose();
+    scrollController.dispose();
+    super.onClose();
+  }
 
-    // Data cho Chat 2
-    final chat2Messages = <MessageModel>[
-      MessageModel(
-          text:
-          "class MyController extends GetxController {\n  var count = 0.obs;\n  void increment() => count++;\n}",
-          role: 'bot',
-          timestamp: DateTime.now().subtract(const Duration(days: 1))),
-      MessageModel(
-          text: "Viết giùm tôi một đoạn code GetX",
-          role: 'user',
-          timestamp: DateTime.now().subtract(const Duration(days: 1))),
-    ];
+  void _initWebSocket() {
+    socket = IO.io(
+        ApiConstants.baseUrlDevWebsocket,
+        IO.OptionBuilder()
+            .setTransports(['websocket', 'polling'])
+            .disableAutoConnect()
+            .setAuth({"token": LocalData.shared.tokenData.val})
+            .build());
+    socket.on('receive-answer', (data) => _handleIncomingMessage(data));
+    socket.connect();
+  }
 
-    final chat3Messages = <MessageModel>[];
+  void _disconnectWebSocket() {
+    if (socket.connected) {
+      socket.disconnect();
+    }
+    socket.dispose();
+  }
 
-    final mockHistory = <ChatModel>[
-      ChatModel(id: 1, name: "Giới thiệu Flutter", messages: chat1Messages),
-      ChatModel(id: 2, name: "Hỏi về GetX", messages: chat2Messages),
-      ChatModel(id: 3, name: "Chat trống", messages: chat3Messages),
-    ];
+  Future<void> loadChatHistory() async {
+    subscribe(
+      future: _chatRepository.getChatHistories(),
+      observer: ObserverFunc(
+        onSubscribe: () {},
+        onSuccess: (response) {
+          final chatResponse = BaseGetResponse<ChatModel>.fromJson(response.body, ChatModel.fromJson);
+          chatHistories.value = chatResponse.chatSessions ?? [];
+        },
+        onError: (error) {
+          showSimpleErrorSnackBar(message: error.message ?? "");
+        },
+      ),
+    );
+  }
 
-    chatHistory.value = mockHistory;
-
-    if (chatHistory.isNotEmpty) {
-      final firstChat = chatHistory.first;
-      messageList.value = firstChat.messages;
-      currentChatId.value = firstChat.id;
+  String loadTitle(String? chatId) {
+    if (chatId == null) return "test".tr;
+    try {
+      final chat = chatHistories.firstWhere((element) => element.id == chatId);
+      return chat.title ?? "test".tr;
+    } catch (e) {
+      return "test".tr;
     }
   }
 
-  void loadMessages(int chatId) {
-    final activeChat = chatHistory.firstWhereOrNull((chat) => chat.id == chatId);
+  void loadMessages(String? chatId){
 
-    if (activeChat != null) {
-      messageList.value = activeChat.messages;
-      currentChatId.value = activeChat.id;
-    }
-    Get.back();
   }
 
   void onNewChat() {
-    messageList.clear();
     currentChatId.value = null;
+    messageList.clear();
     Get.back();
   }
 
   void sendMessage() {
-    final text = textController.text.trim();
-    if (text.isEmpty) return;
+    String content = textController.text.trim();
+    if (content.isEmpty) {
+      return;
+    }
 
-    final userMessage =
-    MessageModel(text: text, role: 'user', timestamp: DateTime.now());
-
-    _saveMessageToHistory(userMessage);
-
-    messageList.insert(0, userMessage);
     textController.clear();
+    MessageModel msg = MessageModel(
+      text: content,
+      role: 'user',
+      timestamp: DateTime.now(),
+    );
 
-    Future.delayed(const Duration(seconds: 1), () {
-      final botMessage = MessageModel(
-          text: "Đây là câu trả lời cho: $text",
-          role: 'bot',
-          timestamp: DateTime.now());
+    messageList.add(msg);
+    _scrollToBottom();
+    isLoadingResponse.value = true;
 
-      _saveMessageToHistory(botMessage);
-
-      messageList.insert(0, botMessage);
-    });
+    Map<String, dynamic> payload = {
+      "question": content,
+      "chatSessionId": currentChatId.value
+    };
+    socket.emit('ask-question', payload);
   }
 
-  void _saveMessageToHistory(MessageModel message) {
-    if (currentChatId.value == null) {
+  void _handleIncomingMessage(Map<String, dynamic> data) {
+    isLoadingResponse.value = false;
 
-      final newChat = ChatModel(
-        id: DateTime.now().millisecondsSinceEpoch,
-        name: message.text.length > 30
-            ? "${message.text.substring(0, 30)}..."
-            : message.text,
-        messages: [message],
-      );
+    String answer = data["answer"] ?? "";
+    String? chatSessionId = data["chatSessionId"];
 
-      chatHistory.insert(0, newChat);
-      currentChatId.value = newChat.id;
-    } else {
-      // TRƯỜNG HỢP 2: CHAT CŨ
-      final activeChat =
-      chatHistory.firstWhereOrNull((chat) => chat.id == currentChatId.value);
+    if (currentChatId.value == null && chatSessionId != null) {
+      currentChatId.value = chatSessionId;
 
-      if (activeChat != null) {
-        activeChat.messages.insert(0, message);
-        // 3. (Tùy chọn) Cập nhật tiêu đề nếu cần
-        // activeChat.name = "Tiêu đề mới";
-
-        // 4. Báo cho GetX biết `chatHistory` đã thay đổi (vì `messages` là list con)
-        chatHistory.refresh();
-      }
+      // Cập nhật Chat History (Thêm vào đầu danh sách Drawer)
+      // ChatModel newChatSession = ChatModel(
+      //     id: returnedChatId,
+      //     name: newTitle ?? "New Conversation",
+      //     messages: []
+      // );
+      // chatHistory.insert(0, newChatSession);
+      loadChatHistory();
     }
+    MessageModel botMsg =
+        MessageModel(text: answer, role: "bot", timestamp: DateTime.now());
+    messageList.add(botMsg);
+
+    _scrollToBottom();
   }
 
   void onProfileTapped() {
     Get.toNamed(PageName.mainPage);
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 }

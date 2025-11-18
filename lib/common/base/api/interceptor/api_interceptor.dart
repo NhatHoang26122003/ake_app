@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:tekup_connection_mobile/common/base/storage/local_data.dart';
 
 const _headerAccept = "Accept";
-const _headerAuthorization = 'Authorization';
+const _headerAuthorization = 'authorization';
 
 class ApiInterceptor extends InterceptorsWrapper {
   @override
@@ -15,8 +15,10 @@ class ApiInterceptor extends InterceptorsWrapper {
 
   Future<void> setHeaderRequest(RequestOptions options) async {
     options.headers[_headerAccept] = "application/json";
+
     if (LocalData.shared.isLogged == true) {
-      options.headers[_headerAuthorization] = 'Bearer ${LocalData.shared.tokenData.val}';
+      // options.headers[_headerAuthorization] = 'Bearer ${LocalData.shared.tokenData.val}';
+      options.headers[_headerAuthorization] = LocalData.shared.tokenData.val;
     }
   }
 

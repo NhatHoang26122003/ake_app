@@ -20,6 +20,13 @@ class AppValidator {
     return null;
   }
 
+  static String? validUserName(String? value) {
+    if (value == null || value.isEmpty) {
+      return "requiredUserName".tr;
+    }
+    return null;
+  }
+
   static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return "requiredEmail".tr;

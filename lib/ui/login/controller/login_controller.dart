@@ -35,7 +35,6 @@ class LoginController extends BaseController {
     }
   }
 
-
   Future<void> onLogin() async {
     final bool isValid = formKey.currentState!.validate();
     if (isValid) {

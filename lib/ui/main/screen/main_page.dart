@@ -24,7 +24,13 @@ class MainPage extends BasePage<MainController> {
         children: [
           _buildAppBar(context),
           Expanded(
-            child: _buildChatList(),
+            child: Obx(() {
+              if (controller.messageList.isEmpty &&
+                  controller.currentChatId.value == null) {
+                return _buildWelcomeScreen();
+              }
+              return _buildChatList();
+            }),
           ),
           _buildInputArea(),
         ],
@@ -53,9 +59,11 @@ class MainPage extends BasePage<MainController> {
           alignment: Alignment.center,
           children: [
             Center(
-              child: Text(
-                "newChat".tr,
-                style: AppStyles.STYLE_18.copyWith(color: AppColors.black80),
+              child: Obx(
+                () => Text(
+                  controller.loadTitle(controller.currentChatId.value),
+                  style: AppStyles.STYLE_18.copyWith(color: AppColors.black80),
+                ),
               ),
             ),
             Align(
@@ -140,7 +148,7 @@ class MainPage extends BasePage<MainController> {
                 ),
               ),
             ),
-            SizedBox(height:25.h),
+            SizedBox(height: 25.h),
             Text(
               "historyChat".tr,
               style: AppStyles.STYLE_18.copyWith(
@@ -150,10 +158,10 @@ class MainPage extends BasePage<MainController> {
             ),
             Obx(() {
               return Column(
-                children: controller.chatHistory
+                children: controller.chatHistories
                     .map((historyItem) => ListTile(
-                          title: Text(historyItem.name ?? "newChat".tr),
-                          onTap: () => controller.loadMessages(historyItem.id ?? 0),
+                          title: Text(historyItem.title ?? "test".tr),
+                          onTap: () => controller.loadMessages(historyItem.id),
                         ))
                     .toList(),
               );
@@ -164,13 +172,47 @@ class MainPage extends BasePage<MainController> {
     );
   }
 
+  Widget _buildWelcomeScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "${'welcome'.tr} ${controller.user?.name} ${"suggestQuestion".tr}",
+            style: AppStyles.STYLE_18.copyWith(
+              color: AppColors.black80,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildChatList() {
     return Obx(
       () => ListView.builder(
-        reverse: true,
+        controller: controller.scrollController,
+        reverse: false,
         padding: EdgeInsets.all(16.w),
-        itemCount: controller.messageList.length,
+        itemCount: controller.messageList.length +
+            (controller.isLoadingResponse.value ? 1 : 0),
         itemBuilder: (context, index) {
+          if (index == controller.messageList.length) {
+            return Padding(
+              padding: EdgeInsets.all(8.w),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  width: 20.w,
+                  height: 20.h,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.w,
+                  ),
+                ),
+              ),
+            );
+          }
           final message = controller.messageList[index];
           return ChatMessageBubble(
             text: message.text,
@@ -190,7 +232,7 @@ class MainPage extends BasePage<MainController> {
           Expanded(
             child: AppTextFiled(
               controller: controller.textController,
-              hintText: "Enter question".tr,
+              hintText: "enterQuestion".tr,
             ),
           ),
           SizedBox(width: 8.w),

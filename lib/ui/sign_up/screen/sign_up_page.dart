@@ -111,6 +111,13 @@ class SignUpPage extends BasePage<SignUpController> {
         mainAxisSize: MainAxisSize.min,
         children: [
           AppTextFiled(
+            labelText: "userName".tr,
+            hintText: "enterUserName".tr,
+            controller: controller.userNameController,
+            validator: (value) => AppValidator.validUserName(value),
+          ),
+          SizedBox(height: 10.h),
+          AppTextFiled(
             labelText: "email".tr,
             hintText: "enterEmail".tr,
             controller: controller.emailController,
