@@ -53,7 +53,7 @@ class AppTextFiled extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (labelText!.isNotEmpty)
+        if (!labelText.isNullOrEmpty)
           RichText(
             text: TextSpan(
               children: [

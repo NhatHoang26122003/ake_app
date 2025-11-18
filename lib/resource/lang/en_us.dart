@@ -19,4 +19,9 @@ const Map<String, String> enUS = {
   "requiredPass": "Password is required",
   "errorPass": "Password must be at least 6 characters long",
   "passwordNotMatch": "Passwords do not match",
+
+  //main page
+  "newChat": "New chat",
+  "historyChat": "History chat",
+
 };

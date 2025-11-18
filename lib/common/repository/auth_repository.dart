@@ -3,4 +3,6 @@ import 'package:tekup_connection_mobile/common/base/api/response/base_response.d
 abstract class AuthRepository{
 
   Future<BaseResponse> login({Map<String, dynamic>? body});
+  Future<BaseResponse> signUp({Map<String, dynamic>? body});
+
 }
