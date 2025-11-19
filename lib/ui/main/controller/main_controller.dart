@@ -6,10 +6,12 @@ import 'package:tekup_connection_mobile/common/base/controller/base_controller.d
 import 'package:tekup_connection_mobile/common/base/controller/observer_func.dart';
 import 'package:tekup_connection_mobile/common/base/storage/local_data.dart';
 import 'package:tekup_connection_mobile/common/repository/chat_repository.dart';
+import 'package:tekup_connection_mobile/common/repository/message_repository.dart';
 import 'package:tekup_connection_mobile/data/model/chat_model.dart';
 import 'package:tekup_connection_mobile/data/model/message_model.dart';
 import 'package:tekup_connection_mobile/data/model/user_model.dart';
 import 'package:tekup_connection_mobile/data/response/base_get_response.dart';
+import 'package:tekup_connection_mobile/data/response/message_response.dart';
 import 'package:tekup_connection_mobile/routes/app_routes.dart';
 
 class MainController extends BaseController {
@@ -18,12 +20,14 @@ class MainController extends BaseController {
   UserModel? user = LocalData.shared.user;
   RxList<ChatModel> chatHistories = <ChatModel>[].obs;
   RxList<MessageModel> messageList = <MessageModel>[].obs;
+  Rx<bool> isLoadingResponse = false.obs;
 
   var currentChatId = Rxn<String>();
-  var isLoadingResponse = false.obs;
+  var currentMessagePage = Rx<int>(1);
 
   late IO.Socket socket;
   final ChatRepository _chatRepository = Get.find();
+  final MessageRepository _messageRepository = Get.find();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController textController = TextEditingController();
   ScrollController scrollController = ScrollController();
@@ -68,7 +72,8 @@ class MainController extends BaseController {
       observer: ObserverFunc(
         onSubscribe: () {},
         onSuccess: (response) {
-          final chatResponse = BaseGetResponse<ChatModel>.fromJson(response.body, ChatModel.fromJson);
+          final chatResponse = BaseGetResponse<ChatModel>.fromJson(
+              response.body, ChatModel.fromJson);
           chatHistories.value = chatResponse.chatSessions ?? [];
         },
         onError: (error) {
@@ -88,8 +93,28 @@ class MainController extends BaseController {
     }
   }
 
-  void loadMessages(String? chatId){
-
+  Future<void> loadMessages(String? chatId) async {
+    // Future.delayed(const Duration(milliseconds: 2000));
+    currentChatId.value = chatId;
+    if (chatId != null) {
+      subscribe(
+        future:
+            _messageRepository.getMessages(chatId, currentMessagePage.value),
+        observer: ObserverFunc(
+          onSubscribe: () {},
+          onSuccess: (response) {
+            final msgResponse =
+                MessageResponse.fromJson(response.body, MessageModel.fromJson);
+            messageList.clear();
+            messageList.value = msgResponse.chatMessages ?? [];
+          },
+          onError: (error) {
+            showSimpleErrorSnackBar(message: error.message ?? "");
+          },
+        ),
+      );
+    }
+    Get.back();
   }
 
   void onNewChat() {
@@ -106,7 +131,7 @@ class MainController extends BaseController {
 
     textController.clear();
     MessageModel msg = MessageModel(
-      text: content,
+      content: content,
       role: 'user',
       timestamp: DateTime.now(),
     );
@@ -130,18 +155,10 @@ class MainController extends BaseController {
 
     if (currentChatId.value == null && chatSessionId != null) {
       currentChatId.value = chatSessionId;
-
-      // Cập nhật Chat History (Thêm vào đầu danh sách Drawer)
-      // ChatModel newChatSession = ChatModel(
-      //     id: returnedChatId,
-      //     name: newTitle ?? "New Conversation",
-      //     messages: []
-      // );
-      // chatHistory.insert(0, newChatSession);
       loadChatHistory();
     }
     MessageModel botMsg =
-        MessageModel(text: answer, role: "bot", timestamp: DateTime.now());
+        MessageModel(content: answer, role: "bot", timestamp: DateTime.now());
     messageList.add(botMsg);
 
     _scrollToBottom();

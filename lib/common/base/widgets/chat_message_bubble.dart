@@ -13,17 +13,22 @@ class ChatMessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: (role == 'user') ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-        margin: EdgeInsets.symmetric(vertical: 4.h),
-        decoration: BoxDecoration(
-          color: (role == 'user') ? AppColors.mainColor : Colors.grey,
-          borderRadius: BorderRadius.circular(16.r),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 0.7.sw,
         ),
-        child: Text(
-          text,
-          style: AppStyles.STYLE_14.copyWith(
-            color: (role == 'user') ? AppColors.white : AppColors.black,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+          margin: EdgeInsets.symmetric(vertical: 4.h),
+          decoration: BoxDecoration(
+            color: (role == 'user') ? AppColors.mainColor : Colors.grey[50],
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Text(
+            text,
+            style: AppStyles.STYLE_14.copyWith(
+              color: (role == 'user') ? AppColors.white : AppColors.black,
+            ),
           ),
         ),
       ),

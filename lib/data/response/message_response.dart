@@ -1,4 +1,4 @@
-class BaseGetResponse<T> {
+class MessageResponse<T> {
   List<T>? chatMessages;
   int? totalItems;
   int? itemPerPage;
@@ -10,7 +10,7 @@ class BaseGetResponse<T> {
   dynamic prevPage;
   dynamic nextPage;
 
-  BaseGetResponse({
+  MessageResponse({
     this.chatMessages,
     this.totalItems,
     this.itemPerPage,
@@ -23,7 +23,7 @@ class BaseGetResponse<T> {
     this.nextPage,
   });
 
-  BaseGetResponse.fromJson(Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJsonT) {
+  MessageResponse.fromJson(Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJsonT) {
     chatMessages = json["chatMessages"] == null
         ? null
         : (json["chatMessages"] as List).map((e) => fromJsonT(e as Map<String, dynamic>)).toList();

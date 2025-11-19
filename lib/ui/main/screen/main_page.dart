@@ -62,7 +62,9 @@ class MainPage extends BasePage<MainController> {
               child: Obx(
                 () => Text(
                   controller.loadTitle(controller.currentChatId.value),
-                  style: AppStyles.STYLE_18.copyWith(color: AppColors.black80),
+                  style: AppStyles.STYLE_18.copyWith(
+                    color: AppColors.black80,
+                  ),
                 ),
               ),
             ),
@@ -215,7 +217,7 @@ class MainPage extends BasePage<MainController> {
           }
           final message = controller.messageList[index];
           return ChatMessageBubble(
-            text: message.text,
+            text: message.content,
             role: message.role,
           );
         },
