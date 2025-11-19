@@ -9,8 +9,20 @@ class ChatRepositoryImpl implements ChatRepository {
   Future<BaseResponse> getChatHistories() {
     return _apiService.getData(endPoint: Endpoint.getChatHistories);
   }
+
+  @override
+  Future<BaseResponse> renameChat(String chatSessionId,
+      {Map<String, dynamic>? body}) {
+    return _apiService.patchData(
+      endPoint: Endpoint.renameChat(chatSessionId),
+      data: body,
+    );
+  }
 }
 
 class Endpoint {
   static const getChatHistories = 'chat-sessions/get-by-user?page=1&limit=20';
+
+  static renameChat(String chatSessionId) =>
+      'chat-sessions/remane-chat-session/$chatSessionId';
 }

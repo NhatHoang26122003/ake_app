@@ -131,4 +131,6 @@ class ApiConstants {
   static const String baseUrlPro = 'https://google.com/';
   static const String baseUrlDev = 'http://192.168.1.8:3000/';
   static const String baseUrlDevWebsocket = 'http://192.168.1.8:3000';
+  // static const String baseUrlDev = 'http://10.10.26.58:3000/';
+  // static const String baseUrlDevWebsocket = 'http://10.10.26.58:3000';
 }

@@ -30,4 +30,6 @@ const Map<String, String> enUS = {
   "suggestQuestion": "can I help you?",
   "enterQuestion": "Enter question",
   "test": "Test chat",
+  "rename": "Rename",
+  "delete": "Delete",
 };

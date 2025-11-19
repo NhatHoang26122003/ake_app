@@ -83,18 +83,48 @@ class MainController extends BaseController {
     );
   }
 
-  String loadTitle(String? chatId) {
-    if (chatId == null) return "test".tr;
-    try {
-      final chat = chatHistories.firstWhere((element) => element.id == chatId);
-      return chat.title ?? "test".tr;
-    } catch (e) {
-      return "test".tr;
+  Future<void> renameChat(String? chatId, String newTitle) async {
+    if (chatId == null) return;
+    final request = {"newTitle": newTitle};
+    subscribe(
+      future: _chatRepository.renameChat(chatId, body: request),
+      observer: ObserverFunc(
+        onSubscribe: () {},
+        onSuccess: (response) {
+          final newTitleResponse = ChatModel.fromJson(response.body);
+          final index = chatHistories.indexWhere((element) => element.id == chatId);
+          if (index != -1) {
+            chatHistories[index].title = newTitleResponse.title ?? newTitle;
+            chatHistories.refresh();
+          }
+        },
+        onError: (error) {
+          showSimpleErrorSnackBar(message: error.message ?? "renameFailed".tr);
+        },
+      ),
+    );
+  }
+
+  Future<void> deleteChat(String? chatId) async {
+    if (chatId != null) {
+      subscribe(
+        future: _chatRepository.getChatHistories(),
+        observer: ObserverFunc(
+          onSubscribe: () {},
+          onSuccess: (response) {
+            final chatResponse = BaseGetResponse<ChatModel>.fromJson(
+                response.body, ChatModel.fromJson);
+            chatHistories.value = chatResponse.chatSessions ?? [];
+          },
+          onError: (error) {
+            showSimpleErrorSnackBar(message: error.message ?? "");
+          },
+        ),
+      );
     }
   }
 
   Future<void> loadMessages(String? chatId) async {
-    // Future.delayed(const Duration(milliseconds: 2000));
     currentChatId.value = chatId;
     if (chatId != null) {
       subscribe(
@@ -107,20 +137,21 @@ class MainController extends BaseController {
                 MessageResponse.fromJson(response.body, MessageModel.fromJson);
             messageList.clear();
             messageList.value = msgResponse.chatMessages ?? [];
+            Get.back();
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              FocusManager.instance.primaryFocus?.unfocus();
+              _scrollToBottom();
+            });
           },
           onError: (error) {
             showSimpleErrorSnackBar(message: error.message ?? "");
           },
         ),
       );
+    } else {
+      Get.back();
     }
-    Get.back();
-  }
-
-  void onNewChat() {
-    currentChatId.value = null;
-    messageList.clear();
-    Get.back();
   }
 
   void sendMessage() {
@@ -164,6 +195,12 @@ class MainController extends BaseController {
     _scrollToBottom();
   }
 
+  void onNewChat() {
+    currentChatId.value = null;
+    messageList.clear();
+    Get.back();
+  }
+
   void onProfileTapped() {
     Get.toNamed(PageName.mainPage);
   }
@@ -178,5 +215,9 @@ class MainController extends BaseController {
         );
       }
     });
+  }
+
+  bool checkCurrentChat(String? chatId) {
+    return (currentChatId.value == chatId) ? true : false;
   }
 }

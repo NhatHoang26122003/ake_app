@@ -10,6 +10,7 @@ import 'package:tekup_connection_mobile/resource/theme/app_style.dart';
 import 'package:tekup_connection_mobile/ui/main/controller/main_controller.dart';
 
 import '../../../common/base/widgets/base_page_widget.dart';
+import '../../../data/model/chat_model.dart';
 
 class MainPage extends BasePage<MainController> {
   const MainPage({super.key});
@@ -55,60 +56,40 @@ class MainPage extends BasePage<MainController> {
       child: Padding(
         padding: EdgeInsets.only(
             top: statusBarHeight + 10.h, bottom: 10.h, left: 10.w, right: 10.w),
-        child: Stack(
-          alignment: Alignment.center,
+        child: Row(
           children: [
-            Center(
-              child: Obx(
-                () => Text(
-                  controller.loadTitle(controller.currentChatId.value),
-                  style: AppStyles.STYLE_18.copyWith(
-                    color: AppColors.black80,
-                  ),
+            InkWell(
+              onTap: () => controller.scaffoldKey.currentState?.openDrawer(),
+              child: SvgPicture.asset(
+                AppImages.icMenu,
+                width: 24.h,
+                height: 28.h,
+                fit: BoxFit.scaleDown,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.black80,
+                  BlendMode.srcIn,
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Row(
-                children: [
-                  InkWell(
-                    onTap: () =>
-                        controller.scaffoldKey.currentState?.openDrawer(),
-                    child: SvgPicture.asset(
-                      AppImages.icMenu,
-                      width: 24.h,
-                      height: 28.h,
-                      fit: BoxFit.scaleDown,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.black80,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 15.w),
-                  Text(
-                    "appName".tr,
-                    style: AppStyles.STYLE_18.copyWith(
-                      color: AppColors.black80,
-                    ),
-                  ),
-                ],
+            SizedBox(width: 15.w),
+            Expanded(
+              child: Text(
+                "appName".tr,
+                style: AppStyles.STYLE_18.copyWith(
+                  color: AppColors.black80,
+                ),
               ),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: InkWell(
-                onTap: controller.onProfileTapped,
-                child: SvgPicture.asset(
-                  AppImages.icProfile,
-                  width: 24.h,
-                  height: 24.h,
-                  fit: BoxFit.scaleDown,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.black80,
-                    BlendMode.srcIn,
-                  ),
+            InkWell(
+              onTap: controller.onProfileTapped,
+              child: SvgPicture.asset(
+                AppImages.icProfile,
+                width: 24.h,
+                height: 24.h,
+                fit: BoxFit.scaleDown,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.black80,
+                  BlendMode.srcIn,
                 ),
               ),
             ),
@@ -133,7 +114,6 @@ class MainPage extends BasePage<MainController> {
               ),
               child: Center(
                 child: ListTile(
-                  // contentPadding: EdgeInsets.zero,
                   leading: SvgPicture.asset(
                     AppImages.icNewChat,
                     height: 24.w,
@@ -151,26 +131,105 @@ class MainPage extends BasePage<MainController> {
               ),
             ),
             SizedBox(height: 25.h),
-            Text(
-              "historyChat".tr,
-              style: AppStyles.STYLE_18.copyWith(
-                color: AppColors.black80,
-                fontWeight: FontWeight.w700,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: Text(
+                "historyChat".tr,
+                style: AppStyles.STYLE_18.copyWith(
+                  color: AppColors.black80,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
+            SizedBox(height: 10.h),
             Obx(() {
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: controller.chatHistories
-                    .map((historyItem) => ListTile(
-                          title: Text(historyItem.title ?? "test".tr),
-                          onTap: () => controller.loadMessages(historyItem.id),
-                        ))
+                    .map((historyItem) => _buildChatHistory(historyItem))
                     .toList(),
               );
-            }),
+            })
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildChatHistory(ChatModel historyItem) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () {
+            controller.loadMessages(historyItem.id);
+          },
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: controller.checkCurrentChat(historyItem.id)
+                  ? Colors.grey[100]
+                  : AppColors.transparent,
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      historyItem.title ?? "test".tr,
+                      style: AppStyles.STYLE_18.copyWith(
+                        color: AppColors.black80,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1,
+                    ),
+                  ),
+                  SizedBox(height: 8.w),
+                  PopupMenuButton<_HistoryAction>(
+                    color: AppColors.white,
+                    shadowColor: Colors.grey,
+                    icon: Icon(
+                      Icons.more_horiz,
+                      color: AppColors.black80,
+                      size: 20.w,
+                    ),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: _HistoryAction.rename,
+                        child: Text(
+                          "rename".tr,
+                          style: AppStyles.STYLE_18.copyWith(
+                            color: AppColors.black80,
+                          ),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: _HistoryAction.delete,
+                        child: Text(
+                          "delete".tr,
+                          style: AppStyles.STYLE_18.copyWith(
+                            color: AppColors.black80,
+                          ),
+                        ),
+                      ),
+                    ],
+                    onSelected: (action) {
+                      if (action == _HistoryAction.rename) {
+                        _showRenameDialog(historyItem);
+                      }
+                      if (action == _HistoryAction.delete) {
+                        _showDeleteConfirm(historyItem);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -228,7 +287,7 @@ class MainPage extends BasePage<MainController> {
   Widget _buildInputArea() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      color: AppColors.white,
+      color: AppColors.transparent,
       child: Row(
         children: [
           Expanded(
@@ -255,4 +314,61 @@ class MainPage extends BasePage<MainController> {
       ),
     );
   }
+
+  void _showRenameDialog(ChatModel item) {
+    final newTitleController = TextEditingController(text: item.title);
+    Get.dialog(
+      AlertDialog(
+        title: Text('Rename'.tr),
+        content: TextField(
+          controller: newTitleController,
+          autofocus: true,
+          decoration: InputDecoration(hintText: 'Enter new title'.tr),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Cancel'.tr),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newTitle = newTitleController.text.trim();
+              if (newTitle.isNotEmpty) {
+                controller.renameChat(item.id!, newTitle);
+              } else {
+                showSimpleErrorSnackBar(message: 'Title cannot be empty'.tr);
+              }
+            },
+            child: Text('Save'.tr),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirm(ChatModel item) {
+    Get.dialog(
+      AlertDialog(
+        title: Text('Delete chat?'.tr),
+        content: Text('Are you sure you want to delete this chat?'.tr),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Cancel'.tr),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              controller.deleteChat(item.id!);
+              Get.back();
+            },
+            child: Text('Delete'.tr),
+          ),
+        ],
+      ),
+    );
+  }
 }
+
+
+enum _HistoryAction { rename, delete }
