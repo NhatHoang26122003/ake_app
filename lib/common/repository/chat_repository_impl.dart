@@ -18,11 +18,20 @@ class ChatRepositoryImpl implements ChatRepository {
       data: body,
     );
   }
+
+  @override
+  Future<BaseResponse> deleteChat(String chatSessionId) {
+    return _apiService.patchData(endPoint: Endpoint.deleteChat(chatSessionId));
+  }
+
 }
 
 class Endpoint {
   static const getChatHistories = 'chat-sessions/get-by-user?page=1&limit=20';
 
   static renameChat(String chatSessionId) =>
-      'chat-sessions/remane-chat-session/$chatSessionId';
+      'chat-sessions/$chatSessionId/name';
+
+  static deleteChat(String chatSessionId) =>
+      'chat-sessions/$chatSessionId/soft-delete';
 }

@@ -9,9 +9,15 @@ class AppButton extends StatelessWidget {
     super.key,
     this.onPressed,
     this.text,
+    this.colorActive,
+    this.colorText,
+    this.textStyle,
   });
   final VoidCallback? onPressed;
   final String? text;
+  final Color? colorActive;
+  final Color? colorText;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -20,16 +26,17 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          disabledBackgroundColor: AppColors.mainColor,
-          backgroundColor: AppColors.mainColor,
-          foregroundColor: AppColors.white,
+          disabledBackgroundColor: colorActive ?? AppColors.mainColor,
+          backgroundColor: colorActive ?? AppColors.mainColor,
+          foregroundColor: colorText ?? AppColors.white,
+          elevation: 2.0,
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 8.h),
           child: Text(
             (text ?? "login".tr),
-            style: AppStyles.STYLE_20_BOLD.copyWith(
-              color: AppColors.white,
+            style: textStyle ?? AppStyles.STYLE_20_BOLD.copyWith(
+              color: colorText ?? AppColors.white,
             ),
           ),
         ),

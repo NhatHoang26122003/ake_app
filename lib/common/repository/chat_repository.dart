@@ -5,4 +5,6 @@ abstract class ChatRepository {
 
   Future<BaseResponse> renameChat(String chatSessionId,
       {Map<String, dynamic>? body});
+
+  Future<BaseResponse> deleteChat(String chatSessionId);
 }

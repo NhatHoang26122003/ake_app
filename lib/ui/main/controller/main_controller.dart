@@ -17,7 +17,7 @@ import 'package:tekup_connection_mobile/routes/app_routes.dart';
 class MainController extends BaseController {
   static MainController get to => Get.find<MainController>();
 
-  UserModel? user = LocalData.shared.user;
+  Rx<UserModel?> user = Rx<UserModel?>(LocalData.shared.user);
   RxList<ChatModel> chatHistories = <ChatModel>[].obs;
   RxList<MessageModel> messageList = <MessageModel>[].obs;
   Rx<bool> isLoadingResponse = false.obs;
@@ -103,18 +103,21 @@ class MainController extends BaseController {
         },
       ),
     );
+    Get.back();
   }
 
   Future<void> deleteChat(String? chatId) async {
     if (chatId != null) {
       subscribe(
-        future: _chatRepository.getChatHistories(),
+        future: _chatRepository.deleteChat(chatId),
         observer: ObserverFunc(
           onSubscribe: () {},
           onSuccess: (response) {
-            final chatResponse = BaseGetResponse<ChatModel>.fromJson(
-                response.body, ChatModel.fromJson);
-            chatHistories.value = chatResponse.chatSessions ?? [];
+            final index = chatHistories.indexWhere((element) => element.id == chatId);
+            if (index != -1) {
+              chatHistories.removeAt(index);
+              chatHistories.refresh();
+            }
           },
           onError: (error) {
             showSimpleErrorSnackBar(message: error.message ?? "");
@@ -122,6 +125,7 @@ class MainController extends BaseController {
         ),
       );
     }
+    Get.back();
   }
 
   Future<void> loadMessages(String? chatId) async {
@@ -202,7 +206,7 @@ class MainController extends BaseController {
   }
 
   void onProfileTapped() {
-    Get.toNamed(PageName.mainPage);
+    Get.toNamed(PageName.profilePage);
   }
 
   void _scrollToBottom() {

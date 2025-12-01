@@ -4,5 +4,5 @@ abstract class AuthRepository{
 
   Future<BaseResponse> login({Map<String, dynamic>? body});
   Future<BaseResponse> signUp({Map<String, dynamic>? body});
-
-}
+  Future<BaseResponse> updateUsername({Map<String, dynamic>? body});
+ }

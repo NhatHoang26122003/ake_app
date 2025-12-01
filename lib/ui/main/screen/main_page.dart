@@ -238,11 +238,28 @@ class MainPage extends BasePage<MainController> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            "${'welcome'.tr} ${controller.user?.name} ${"suggestQuestion".tr}",
-            style: AppStyles.STYLE_18.copyWith(
-              color: AppColors.black80,
-              fontWeight: FontWeight.w500,
+          Obx(
+            () => Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "${'welcome'.tr} ${controller.user.value?.name ?? ""}",
+                    style: AppStyles.STYLE_20.copyWith(
+                      color: AppColors.black80,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    'suggestQuestion'.tr,
+                    style: AppStyles.STYLE_20.copyWith(
+                      color: AppColors.black80,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -319,16 +336,16 @@ class MainPage extends BasePage<MainController> {
     final newTitleController = TextEditingController(text: item.title);
     Get.dialog(
       AlertDialog(
-        title: Text('Rename'.tr),
+        title: Text('rename'.tr),
         content: TextField(
           controller: newTitleController,
           autofocus: true,
-          decoration: InputDecoration(hintText: 'Enter new title'.tr),
+          decoration: InputDecoration(hintText: 'enterTitle'.tr),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancel'.tr),
+            child: Text('cancel'.tr),
           ),
           ElevatedButton(
             onPressed: () {
@@ -336,10 +353,10 @@ class MainPage extends BasePage<MainController> {
               if (newTitle.isNotEmpty) {
                 controller.renameChat(item.id!, newTitle);
               } else {
-                showSimpleErrorSnackBar(message: 'Title cannot be empty'.tr);
+                showSimpleErrorSnackBar(message: 'titleNotEmpty'.tr);
               }
             },
-            child: Text('Save'.tr),
+            child: Text('save'.tr),
           ),
         ],
       ),
@@ -349,26 +366,24 @@ class MainPage extends BasePage<MainController> {
   void _showDeleteConfirm(ChatModel item) {
     Get.dialog(
       AlertDialog(
-        title: Text('Delete chat?'.tr),
-        content: Text('Are you sure you want to delete this chat?'.tr),
+        title: Text('deleteChat'.tr),
+        content: Text('confirmDelete'.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancel'.tr),
+            child: Text('cancel'.tr),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               controller.deleteChat(item.id!);
-              Get.back();
             },
-            child: Text('Delete'.tr),
+            child: Text('delete'.tr),
           ),
         ],
       ),
     );
   }
 }
-
 
 enum _HistoryAction { rename, delete }

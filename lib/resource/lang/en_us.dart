@@ -22,14 +22,31 @@ const Map<String, String> enUS = {
   "requiredPass": "Password is required",
   "errorPass": "Password must be at least 6 characters long",
   "passwordNotMatch": "Passwords do not match",
+  "loginSuccessful": "Login successfully",
 
   //main page
   "newChat": "New chat",
   "historyChat": "History chat",
   "welcome": "Welcome",
-  "suggestQuestion": "can I help you?",
+  "suggestQuestion": "Can I help you?",
   "enterQuestion": "Enter question",
   "test": "Test chat",
   "rename": "Rename",
+  "renameSuccessfully": "update chat title successfully",
+  "renameFailed": "Failed to update chat title!",
   "delete": "Delete",
+  "enterTitle": "Enter the title",
+  "cancel": "Cancel",
+  "titleNotEmpty": "Title cannot be empty",
+  "save": "Save",
+  "deleteChat": "Delete chat?",
+  "confirmDelete": "Are you sure you want to delete this chat?",
+
+  // Profile page
+  "profile": "Profile",
+  "username": "Username",
+  "enterUsername": "Enter username",
+  "changePassword": "Change password",
+  "updateUsernameFailed": "Failed to update username!",
+  "updateUsernameSuccessful": "Updated successfully",
 };

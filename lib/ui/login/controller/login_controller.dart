@@ -52,6 +52,7 @@ class LoginController extends BaseController {
             final authResponse = AuthResponse.fromJson(response.body);
             LocalData.shared.tokenData.val = authResponse.accessToken ?? "";
             LocalData.shared.user = authResponse.user;
+            showSimpleSuccessSnackBar(message: "loginSuccessful".tr);
             onNavigateMainPage();
           },
           onError: (error) {

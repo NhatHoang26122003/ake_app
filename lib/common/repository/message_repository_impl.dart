@@ -7,7 +7,7 @@ class MessageRepositoryImpl implements MessageRepository {
 
   @override
   Future<BaseResponse> getMessages(String chatSessionId, int page,
-      [int limit = 10]) {
+      [int limit = 20]) {
     Map<String, dynamic> query = {"page": page, "limit": limit};
     return _apiService.getData(
       endPoint: Endpoint.getMessages(chatSessionId),

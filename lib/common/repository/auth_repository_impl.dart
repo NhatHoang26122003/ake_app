@@ -13,9 +13,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<BaseResponse> signUp({Map<String, dynamic>? body}) {
     return _apiService.postData(endPoint: Endpoint.signUp, data: body);
   }
+  @override
+  Future<BaseResponse> updateUsername({Map<String, dynamic>? body}) {
+    return _apiService.patchData(endPoint: Endpoint.updateUsername, data: body);
+  }
 }
 
 class Endpoint {
   static const login = 'users/login';
   static const signUp = 'users/sign-up';
+  static const updateUsername = 'users/username';
 }
