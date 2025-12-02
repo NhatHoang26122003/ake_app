@@ -56,7 +56,6 @@ class SignUpController extends BaseController {
         ),
         isShowLoading: true,
       );
-
     }
   }
 

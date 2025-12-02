@@ -40,12 +40,15 @@ class ProfilePage extends BasePage<ProfileController> {
                         const Expanded(
                           child: SizedBox(),
                         ),
-                        Text(
-                          "changePassword".tr,
-                          style: AppStyles.STYLE_14.copyWith(
-                            color: AppColors.black80,
-                            decoration: TextDecoration.underline,
-                            decorationColor: AppColors.black80,
+                        InkWell(
+                          onTap: _showChangePasswordDialog,
+                          child: Text(
+                            "changePassword".tr,
+                            style: AppStyles.STYLE_14.copyWith(
+                              color: AppColors.black80,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.black80,
+                            ),
                           ),
                         ),
                       ],
@@ -83,7 +86,7 @@ class ProfilePage extends BasePage<ProfileController> {
           children: [
             InkWell(
               child: SvgPicture.asset(
-                AppImages.icMenu,
+                AppImages.icBack,
                 width: 24.h,
                 height: 28.h,
                 fit: BoxFit.scaleDown,
@@ -191,6 +194,132 @@ class ProfilePage extends BasePage<ProfileController> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showChangePasswordDialog() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.white,
+        title: Text(
+          'changePassword'.tr,
+          style: AppStyles.STYLE_24.copyWith(
+            color: AppColors.black80,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Form(
+          key: controller.formKey,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Obx(
+                  () => AppTextFiled(
+                    labelText: "oldPassword".tr,
+                    hintText: "enterOldPassword".tr,
+                    controller: controller.oldPasswordController,
+                    obscureText: !controller.isShowOldPassword.value,
+                    validator: (value) => AppValidator.validatePassword(value),
+                    suffixIcon: InkWell(
+                      onTap: controller.toggleShowOldPassword,
+                      child: SvgPicture.asset(
+                        controller.isShowOldPassword.value
+                            ? AppImages.icEyeSlash
+                            : AppImages.icEye,
+                        height: 24.w,
+                        width: 24.w,
+                        fit: BoxFit.scaleDown,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                Obx(
+                  () => AppTextFiled(
+                    labelText: "newPassword".tr,
+                    hintText: "enterNewPassword".tr,
+                    controller: controller.passwordController,
+                    obscureText: !controller.isShowPassword.value,
+                    validator: (value) => AppValidator.validatePassword(value),
+                    suffixIcon: InkWell(
+                      onTap: controller.toggleShowPassword,
+                      child: SvgPicture.asset(
+                        controller.isShowPassword.value
+                            ? AppImages.icEyeSlash
+                            : AppImages.icEye,
+                        height: 24.w,
+                        width: 24.w,
+                        fit: BoxFit.scaleDown,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                Obx(
+                  () => AppTextFiled(
+                    labelText: "confirmPassword".tr,
+                    hintText: "enterConfirmPassword".tr,
+                    controller: controller.confirmPasswordController,
+                    obscureText: !controller.isShowConfirmPassword.value,
+                    validator: (value) => AppValidator.validateConfirmPassword(
+                      value,
+                      controller.passwordController.text.trim(),
+                    ),
+                    suffixIcon: InkWell(
+                      onTap: controller.toggleShowConfirmPassword,
+                      child: SvgPicture.asset(
+                        controller.isShowConfirmPassword.value
+                            ? AppImages.icEyeSlash
+                            : AppImages.icEye,
+                        height: 24.w,
+                        width: 24.w,
+                        fit: BoxFit.scaleDown,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                flex: 1,
+                child: AppButton(
+                  text: "cancel".tr,
+                  textStyle: AppStyles.STYLE_16.copyWith(
+                    color: AppColors.black80,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  colorActive: Colors.grey[50],
+                  onPressed: Get.back,
+                ),
+              ),
+              SizedBox(width: 20.w),
+              Flexible(
+                flex: 1,
+                child: AppButton(
+                  text: "save".tr,
+                  textStyle: AppStyles.STYLE_16.copyWith(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  colorActive: AppColors.mainColor,
+                  onPressed: () => controller.changePassword(
+                      controller.oldPasswordController.text.trim(),
+                      controller.passwordController.text.trim()),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

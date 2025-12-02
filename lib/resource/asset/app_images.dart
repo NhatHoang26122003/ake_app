@@ -12,4 +12,5 @@ class AppImages {
   static const icSend = '${assetsIcon}ic_send.svg';
   static const icMenu = '${assetsIcon}ic_menu.svg';
   static const icProfile = '${assetsIcon}ic_profile.svg';
+  static const icBack = '${assetsIcon}ic_back.svg';
 }

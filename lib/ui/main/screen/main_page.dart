@@ -62,7 +62,7 @@ class MainPage extends BasePage<MainController> {
               onTap: () => controller.scaffoldKey.currentState?.openDrawer(),
               child: SvgPicture.asset(
                 AppImages.icMenu,
-                width: 24.h,
+                width: 28.h,
                 height: 28.h,
                 fit: BoxFit.scaleDown,
                 colorFilter: const ColorFilter.mode(
@@ -77,19 +77,35 @@ class MainPage extends BasePage<MainController> {
                 "appName".tr,
                 style: AppStyles.STYLE_18.copyWith(
                   color: AppColors.black80,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
             InkWell(
               onTap: controller.onProfileTapped,
-              child: SvgPicture.asset(
-                AppImages.icProfile,
-                width: 24.h,
-                height: 24.h,
-                fit: BoxFit.scaleDown,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.black80,
-                  BlendMode.srcIn,
+              child: Container(
+                width: 24.w,
+                height: 24.w,
+                decoration: BoxDecoration(
+                  color: Colors.purpleAccent,
+                  borderRadius: BorderRadius.circular(60.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.black80.withOpacity(0.2),
+                      spreadRadius: 0,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    (controller.user.value?.name[0] ?? "u").toUpperCase(),
+                    style: AppStyles.STYLE_12.copyWith(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w700,
+                    )
+                  ),
                 ),
               ),
             ),

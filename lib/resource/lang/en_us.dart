@@ -49,4 +49,10 @@ const Map<String, String> enUS = {
   "changePassword": "Change password",
   "updateUsernameFailed": "Failed to update username!",
   "updateUsernameSuccessful": "Updated successfully",
+  "newPassword": "New password",
+  "oldPassword": "Old password",
+  "enterNewPassword": "Enter new password",
+  "enterOldPassword": "Enter old password",
+  "changePasswordSuccessful": "Change password successfully",
+  "changePasswordFailed": "Failed to change password",
 };
